@@ -39,9 +39,16 @@ function player(positionX, positionY) {
   this.x = positionX;
   this.y = positionY;
   draw(x, y);
-  requestAnimationFrame(draw);
+  requestAnimationFrame(player);
 }
 player(positionX, positionY);
+
+//player movement auto
+function autoMovement(){
+    
+}
+
+
 
 //arrows
 window.addEventListener(
@@ -88,7 +95,7 @@ window.addEventListener(
         // Do something for "esc" key press.
         break;
       default:
-        return; 
+        return;
     }
     console.log(event.key);
     event.preventDefault();
