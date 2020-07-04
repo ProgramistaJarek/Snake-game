@@ -10,18 +10,19 @@ let award;
 let collision;
 let speed = 30;
 let speedTime = 100;
+let coordinates = { x: 0, y: 0 };
 
 //player
-let positionX = 300;
-let positionY = 300;
+let position = { x: 300, y: 300 };
 let box = 30;
 let snake = [
-  { x: positionX, y: positionY },
-  { x: positionX, y: positionY + 1 * box },
-  { x: positionX, y: positionY + 2 * box },
-  { x: positionX, y: positionY + 3 * box },
+  { x: 300, y: 300 },
+  { x: 300, y: 330 },
+  { x: 300, y: 360 },
+  { x: 300, y: 390 },
 ];
-let auto = 0;
+let auto;
+let head;
 
 //points
 let randomX = (canvas.width - 30) / 30;
@@ -35,8 +36,9 @@ pointPositionY = pointPositionY * 30;
 //game
 function init() {
   buildBoard();
-  drawPlayer(positionX, positionY);
+  drawPlayer();
   points(pointPositionX, pointPositionY);
+  headSnake();
   requestAnimationFrame(init);
 }
 
@@ -61,35 +63,23 @@ function buildBoard() {
 }
 
 //player
-function draw(x, y) {
+function draw(snakePart) {
   ctx.fillStyle = "yellow";
   ctx.beginPath();
-  ctx.fillRect(x, y, box, box);
-  ctx.strokeRect(x, y, box, box);
-  ctx.closePath();
-}
-
-function drawPlayer(positionX, positionY) {
-  x = positionX;
-  y = positionY;
-  draw(x, y);
-}
-
-//this code it isn't my (:
-function advanceSnake() {
-  const head = { x: snake[0].x, y: snake[0].y };
-}
-
-function drawSnakePart(snakePart) {
-  ctx.fillStyle = "yellow";
   ctx.fillRect(snakePart.x, snakePart.y, box, box);
   ctx.strokeRect(snakePart.x, snakePart.y, box, box);
 }
-function drawSnake() {
-  snake.forEach(drawSnakePart);
+
+function drawPlayer() {
+  snake.forEach(draw);
 }
 
-drawPlayer(positionX, positionY);
+//this code it isn't my (:
+function headSnake() {
+  head = { x: snake[0].x, y: snake[0].y };
+}
+
+drawPlayer();
 
 //arrows
 window.addEventListener("keydown", arrows);
@@ -102,21 +92,25 @@ function arrows(event) {
     case "ArrowDown":
       if (auto == 2) auto = 2;
       else auto = 1;
+      coordinates.x = head.x;
       break;
     case "Up":
     case "ArrowUp":
       if (auto == 1) auto = 1;
       else auto = 2;
+      coordinates.x = head.x;
       break;
     case "Left":
     case "ArrowLeft":
       if (auto == 4) auto = 4;
       else auto = 3;
+      coordinates.y = head.y;
       break;
     case "Right":
     case "ArrowRight":
       if (auto == 3) auto = 3;
       else auto = 4;
+      coordinates.y = head.y;
       break;
     case "Enter":
       // Do something for "enter" or "return" key press.
@@ -133,20 +127,47 @@ function arrows(event) {
 
 //auto move
 function autoMoveY() {
-  positionY += speed;
-  drawPlayer(positionX, positionY);
+  for (let i = 0; i < snake.length; i++) snake[i].y += speed;
+  drawPlayer();
   ctx.clearRect(0, 0, canvas.height, canvas.width);
   buildBoard();
-  drawPlayer(positionX, positionY);
   points(pointPositionX, pointPositionY);
 }
 
 function autoMoveX() {
-  positionX += speed;
-  drawPlayer(positionX, positionY);
+  if (auto == 3) {
+    for (let i = 0; i < snake.length; i++) {
+      if (snake[i].y == coordinates.y) {
+        snake[i].x += speed;
+      } else {
+        if (auto == 1) {
+          speed = 30;
+          snake[i].y += speed;
+        } else {
+          speed = -30;
+          snake[i].y += speed;
+        }
+      }
+      drawPlayer();
+    }
+  } else {
+    for (let i = 0; i < snake.length; i++) {
+      if (snake[i].y == coordinates.y) {
+        snake[i].x -= speed;
+      } else {
+        if (auto == 1) {
+          speed = 30;
+          snake[i].y += speed;
+        } else {
+          speed = -30;
+          snake[i].y += speed;
+        }
+      }
+      drawPlayer();
+    }
+  }
   ctx.clearRect(0, 0, canvas.height, canvas.width);
   buildBoard();
-  drawPlayer(positionX, positionY);
   points(pointPositionX, pointPositionY);
 }
 
@@ -160,25 +181,21 @@ function move() {
     myStopFunctionY();
     myStopFunctionX();
     speed = 30;
-    positionX = positionX;
     autoY = setInterval(autoMoveY, speedTime);
   } else if (auto == 2) {
     myStopFunctionY();
     myStopFunctionX();
     speed = -30;
-    positionX = positionX;
     autoY = setInterval(autoMoveY, speedTime);
   } else if (auto == 3) {
     myStopFunctionY();
     myStopFunctionX();
     speed = -30;
-    positionY = positionY;
     autoX = setInterval(autoMoveX, speedTime);
   } else if (auto == 4) {
     myStopFunctionY();
     myStopFunctionX();
     speed = 30;
-    positionY = positionY;
     autoX = setInterval(autoMoveX, speedTime);
   }
 }
