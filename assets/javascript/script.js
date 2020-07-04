@@ -1,13 +1,46 @@
+//canvas
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
-let score;
+canvas.width = 600;
+canvas.height = 600;
+
+//variables
+let score = 0;
 let award;
 let collision;
 let speed = 30;
 let speedTime = 100;
 
-canvas.width = 600;
-canvas.height = 600;
+//player
+let positionX = 300;
+let positionY = 300;
+let box = 30;
+let snake = [
+  { x: positionX, y: positionY },
+  { x: positionX, y: positionY + 1 * box },
+  { x: positionX, y: positionY + 2 * box },
+  { x: positionX, y: positionY + 3 * box },
+];
+let auto = 0;
+
+//points
+let randomX = (canvas.width - 30) / 30;
+let randomY = (canvas.height - 30) / 30;
+let pointPositionX = Math.floor(Math.random() * randomX);
+let pointPositionY = Math.floor(Math.random() * randomY);
+let pointsBox = 30;
+pointPositionX = pointPositionX * 30;
+pointPositionY = pointPositionY * 30;
+
+//game
+function init() {
+  buildBoard();
+  drawPlayer(positionX, positionY);
+  points(pointPositionX, pointPositionY);
+  requestAnimationFrame(init);
+}
+
+init();
 
 //board
 function buildBoard() {
@@ -26,101 +59,101 @@ function buildBoard() {
   }
   ctx.closePath();
 }
-buildBoard();
 
 //player
-let positionX = 301;
-let positionY = 301;
-let playerWidth = 29;
-let playerHeight = 29;
-let playerLenght = 4;
-
 function draw(x, y) {
   ctx.fillStyle = "yellow";
   ctx.beginPath();
-  ctx.fillRect(x, y, playerWidth, playerHeight);
+  ctx.fillRect(x, y, box, box);
+  ctx.strokeRect(x, y, box, box);
   ctx.closePath();
 }
 
-let player = (positionX, positionY) => {
-  this.x = positionX;
-  this.y = positionY;
-  for (let i = 0; i < playerLenght; i++) {
-    draw(x, y + i * 30);
-  }
-  requestAnimationFrame(player);
-};
-player(positionX, positionY);
+function drawPlayer(positionX, positionY) {
+  x = positionX;
+  y = positionY;
+  draw(x, y);
+}
 
-let auto = 0;
+//this code it isn't my (:
+function advanceSnake() {
+  const head = { x: snake[0].x, y: snake[0].y };
+}
+
+function drawSnakePart(snakePart) {
+  ctx.fillStyle = "yellow";
+  ctx.fillRect(snakePart.x, snakePart.y, box, box);
+  ctx.strokeRect(snakePart.x, snakePart.y, box, box);
+}
+function drawSnake() {
+  snake.forEach(drawSnakePart);
+}
+
+drawPlayer(positionX, positionY);
 
 //arrows
-window.addEventListener(
-  "keydown",
-  function (event) {
-    if (event.defaultPrevented) {
-      return;
-    }
+window.addEventListener("keydown", arrows);
 
-    switch (event.key) {
-      case "Down":
-      case "ArrowDown":
-        if (auto == 2) auto = 2;
-        else auto = 1;
-        break;
-      case "Up":
-      case "ArrowUp":
-        if (auto == 1) auto = 1;
-        else auto = 2;
-        break;
-      case "Left":
-      case "ArrowLeft":
-        if (auto == 4) auto = 4;
-        else auto = 3;
-        break;
-      case "Right":
-      case "ArrowRight":
-        if (auto == 3) auto = 3;
-        else auto = 4;
-        break;
-      case "Enter":
-        // Do something for "enter" or "return" key press.
-        break;
-      case "Escape":
-        // Do something for "esc" key press.
-        break;
-      default:
-        return;
-    }
-    console.log(event.key);
-    event.preventDefault();
-  },
-  true
-);
+function arrows(event) {
+  if (event.defaultPrevented) return;
+
+  switch (event.key) {
+    case "Down":
+    case "ArrowDown":
+      if (auto == 2) auto = 2;
+      else auto = 1;
+      break;
+    case "Up":
+    case "ArrowUp":
+      if (auto == 1) auto = 1;
+      else auto = 2;
+      break;
+    case "Left":
+    case "ArrowLeft":
+      if (auto == 4) auto = 4;
+      else auto = 3;
+      break;
+    case "Right":
+    case "ArrowRight":
+      if (auto == 3) auto = 3;
+      else auto = 4;
+      break;
+    case "Enter":
+      // Do something for "enter" or "return" key press.
+      break;
+    case "Escape":
+      // Do something for "esc" key press.
+      break;
+    default:
+      return;
+  }
+  console.log(event.key);
+  event.preventDefault();
+}
 
 //auto move
 function autoMoveY() {
   positionY += speed;
-  player(positionX, positionY);
+  drawPlayer(positionX, positionY);
   ctx.clearRect(0, 0, canvas.height, canvas.width);
   buildBoard();
-  player(positionX, positionY);
+  drawPlayer(positionX, positionY);
   points(pointPositionX, pointPositionY);
 }
 
 function autoMoveX() {
   positionX += speed;
-  player(positionX, positionY);
+  drawPlayer(positionX, positionY);
   ctx.clearRect(0, 0, canvas.height, canvas.width);
   buildBoard();
-  player(positionX, positionY);
+  drawPlayer(positionX, positionY);
   points(pointPositionX, pointPositionY);
 }
 
 document.addEventListener("keyup", move);
 
-var autoY = 0;
-var autoX = 0;
+let autoY = 0;
+let autoX = 0;
 
 function move() {
   if (auto == 1) {
@@ -159,31 +192,16 @@ function myStopFunctionX() {
 }
 
 //points
-
-let randomX = (canvas.width - 30) / 30;
-let randomY = (canvas.height - 30) / 30;
-
-let pointPositionX = Math.floor(Math.random() * randomX);
-let pointPositionY = Math.floor(Math.random() * randomY);
-let pointWidth = 30;
-let pointHeight = 30;
-
-console.log(pointPositionX * 30);
-console.log(pointPositionY * 30);
-pointPositionX = pointPositionX * 30;
-pointPositionY = pointPositionY * 30;
-
 function drawPoints(x, y) {
   ctx.fillStyle = "red";
   ctx.beginPath();
-  ctx.fillRect(x, y, pointWidth, pointHeight);
+  ctx.fillRect(x, y, pointsBox, pointsBox);
   ctx.closePath();
 }
 
-let points = (pointPositionX, pointPositionY) => {
-  this.x = pointPositionX;
-  this.y = pointPositionY;
+function points(pointPositionX, pointPositionY) {
+  x = pointPositionX;
+  y = pointPositionY;
   drawPoints(x, y);
   requestAnimationFrame(points);
-};
-points(pointPositionX, pointPositionY);
+}
