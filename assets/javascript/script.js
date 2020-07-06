@@ -36,9 +36,9 @@ pointPositionY = pointPositionY * 30;
 //game
 function init() {
   buildBoard();
+  headSnake();
   drawPlayer();
   points(pointPositionX, pointPositionY);
-  headSnake();
   requestAnimationFrame(init);
 }
 
@@ -64,7 +64,10 @@ function buildBoard() {
 
 //player
 function draw(snakePart) {
-  ctx.fillStyle = "yellow";
+  if (snakePart.x == head.x && snakePart.y == head.y)
+    ctx.fillStyle = "white";
+  else
+    ctx.fillStyle = "yellow";
   ctx.beginPath();
   ctx.fillRect(snakePart.x, snakePart.y, box, box);
   ctx.strokeRect(snakePart.x, snakePart.y, box, box);
@@ -78,8 +81,6 @@ function drawPlayer() {
 function headSnake() {
   head = { x: snake[0].x, y: snake[0].y };
 }
-
-drawPlayer();
 
 //arrows
 window.addEventListener("keydown", arrows);
@@ -127,8 +128,25 @@ function arrows(event) {
 
 //auto move
 function autoMoveY() {
-  for (let i = 0; i < snake.length; i++) snake[i].y += speed;
-  drawPlayer();
+  if (auto == 1) {
+    for (let i = 0; i < snake.length; i++) {
+      if (snake[i].x == head.x) { // czemu coordianate nie dziala a head dziala ??
+        snake[i].y += speed;
+      } else {
+        snake[i].x -= speed;
+      }
+      drawPlayer();
+    }
+  } else {
+    for (let i = 0; i < snake.length; i++) {
+      if (snake[i].x == head.x) { // czemu coordianate nie dziala a head dziala ??
+        snake[i].y += speed;
+      } else {
+        snake[i].x -= speed;
+      }
+      drawPlayer();
+    }
+  }
   ctx.clearRect(0, 0, canvas.height, canvas.width);
   buildBoard();
   points(pointPositionX, pointPositionY);
@@ -137,39 +155,19 @@ function autoMoveY() {
 function autoMoveX() {
   if (auto == 3) {
     for (let i = 0; i < snake.length; i++) {
-      if (snake[i].y == coordinates.y) {
-        console.log(snake[i].y);
-        console.log(coordinates.y);
-        console.log('działa?');
+      if (snake[i].y == head.y) { // czemu coordianate nie dziala a head dziala ??
         snake[i].x += speed;
       } else {
-        console.log(snake[i].y);
-        console.log(coordinates.y -30);
-        console.log('2');
-        if (auto == 1) {
-          speed = 30;
-          snake[i].y += speed;
-        } else {
-          speed = -30;
-          snake[i].y += speed;
-        }
+        snake[i].y += speed;
       }
       drawPlayer();
     }
   } else {
     for (let i = 0; i < snake.length; i++) {
-      if (snake[i].y == coordinates.y) {
-        snake[i].x -= speed;
-        console.log(snake[i].x);
-        console.log(coordinates.y);
+      if (snake[i].y == head.y) { // czemu coordianate nie dziala a head dziala ??
+        snake[i].x += speed;
       } else {
-        if (auto == 1) {
-          speed = 30;
-          snake[i].y += speed;
-        } else {
-          speed = -30;
-          snake[i].y += speed;
-        }
+        snake[i].y -= speed;
       }
       drawPlayer();
     }
