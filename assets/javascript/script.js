@@ -138,8 +138,14 @@ function autoMoveX() {
   if (auto == 3) {
     for (let i = 0; i < snake.length; i++) {
       if (snake[i].y == coordinates.y) {
+        console.log(snake[i].y);
+        console.log(coordinates.y);
+        console.log('1');
         snake[i].x += speed;
       } else {
+        console.log(snake[i].y);
+        console.log(coordinates.y -30);
+        console.log('2');
         if (auto == 1) {
           speed = 30;
           snake[i].y += speed;
@@ -154,6 +160,8 @@ function autoMoveX() {
     for (let i = 0; i < snake.length; i++) {
       if (snake[i].y == coordinates.y) {
         snake[i].x -= speed;
+        console.log(snake[i].x);
+        console.log(coordinates.y);
       } else {
         if (auto == 1) {
           speed = 30;
