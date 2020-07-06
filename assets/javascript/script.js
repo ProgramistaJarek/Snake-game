@@ -140,7 +140,7 @@ function autoMoveX() {
       if (snake[i].y == coordinates.y) {
         console.log(snake[i].y);
         console.log(coordinates.y);
-        console.log('1');
+        console.log('działa?');
         snake[i].x += speed;
       } else {
         console.log(snake[i].y);
