@@ -6,8 +6,6 @@ canvas.height = 600;
 
 //variables
 let score = 0;
-let award;
-let collision;
 let speed = 30;
 let speedTime = 100;
 let coordinates = { x: 0, y: 0 };
@@ -25,15 +23,14 @@ let auto;
 let head;
 let d;
 let GAME;
+let k = false;
 
 //points
 let randomX = (canvas.width - 30) / 30;
 let randomY = (canvas.height - 30) / 30;
 let pointsBox = 30;
-let pointPositionX = Math.floor(Math.random() * randomX);
-let pointPositionY = Math.floor(Math.random() * randomY);
-pointPositionX = pointPositionX * 30;
-pointPositionY = pointPositionY * 30;
+let pointPositionX = Math.floor(Math.random() * randomX) * 30;
+let pointPositionY = Math.floor(Math.random() * randomY) * 30;
 
 // code for change frames in requestAnimationFrame
 var stop = false;
@@ -67,6 +64,7 @@ function animate() {
     buildBoard();
     headSnake();
     drawPlayer();
+    //checkPoint();
     drawPoints();
   }
 }
@@ -151,15 +149,23 @@ function drawPlayer() {
 
     if (snake[0].x == pointPositionX && snake[0].y == pointPositionY) {
       score++;
-      pointPositionX = Math.floor(Math.random() * randomX);
-      pointPositionY = Math.floor(Math.random() * randomY);
-      pointPositionX = pointPositionX * 30;
-      pointPositionY = pointPositionY * 30;
+      pointPositionX = Math.floor(Math.random() * randomX) * 30;
+      pointPositionY = Math.floor(Math.random() * randomY) * 30;
     } else snake.pop();
+
     let newHead = {
       x: snakeX,
       y: snakeY,
     };
+
+    if (
+      snakeX == canvas.width + box ||
+      snakeY == canvas.height + box ||
+      snakeX == -2 * box ||
+      snakeY == -2 * box ||
+      collision(newHead)
+    )
+      alert("Game over");
 
     snake.unshift(newHead);
   }
@@ -175,4 +181,20 @@ function drawPoints() {
   ctx.beginPath();
   ctx.fillRect(pointPositionX, pointPositionY, pointsBox, pointsBox);
   ctx.closePath();
+}
+
+function checkPoint() {
+  for (let i = 0; i < snake.length; i++) {
+    if (snake[i+1] == pointPositionX && snake[i+1].y == pointPositionY) {
+      pointPositionX = Math.floor(Math.random() * randomX) * 30;
+      pointPositionY = Math.floor(Math.random() * randomX) * 30;
+    }
+  }
+}
+
+//collision
+function collision(head) {
+  for (let i = 0; i < snake.length; i++) {
+    if (head.x == snake[i].x && head.y == snake[i].y) return true;
+  }
 }
