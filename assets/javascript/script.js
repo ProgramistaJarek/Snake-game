@@ -20,6 +20,9 @@ let snake = [
   { x: 300, y: 330 },
   { x: 300, y: 360 },
   { x: 300, y: 390 },
+  { x: 300, y: 420 },
+  { x: 300, y: 450 },
+  { x: 300, y: 480 },
 ];
 let auto;
 let head;
@@ -93,25 +96,21 @@ function arrows(event) {
     case "ArrowDown":
       if (auto == 2) auto = 2;
       else auto = 1;
-      coordinates.x = head.x;
       break;
     case "Up":
     case "ArrowUp":
       if (auto == 1) auto = 1;
       else auto = 2;
-      coordinates.x = head.x;
       break;
     case "Left":
     case "ArrowLeft":
       if (auto == 4) auto = 4;
       else auto = 3;
-      coordinates.y = head.y;
       break;
     case "Right":
     case "ArrowRight":
       if (auto == 3) auto = 3;
       else auto = 4;
-      coordinates.y = head.y;
       break;
     case "Enter":
       // Do something for "enter" or "return" key press.
@@ -127,44 +126,38 @@ function arrows(event) {
 }
 
 //auto move
-function autoMoveY() {
+function autoMove() {
   if (auto == 1) {
     for (let i = 0; i < snake.length; i++) {
-      if (snake[i].x == head.x) { // czemu coordianate nie dziala a head dziala ??
+      if (snake[i].x == head.x) {
         snake[i].y += speed;
       } else {
-        snake[i].x -= speed;
+          snake[i].x -= speed;
       }
       drawPlayer();
     }
-  } else {
+  } else if (auto == 2) {
     for (let i = 0; i < snake.length; i++) {
-      if (snake[i].x == head.x) { // czemu coordianate nie dziala a head dziala ??
-        snake[i].y += speed;
+      if (snake[i].x == head.x) {
+        snake[i].y -= speed;
       } else {
-        snake[i].x -= speed;
+        snake[i].x += speed;
       }
       drawPlayer();
     }
   }
-  ctx.clearRect(0, 0, canvas.height, canvas.width);
-  buildBoard();
-  points(pointPositionX, pointPositionY);
-}
-
-function autoMoveX() {
-  if (auto == 3) {
+  else if (auto == 3) {
     for (let i = 0; i < snake.length; i++) {
-      if (snake[i].y == head.y) { // czemu coordianate nie dziala a head dziala ??
-        snake[i].x += speed;
+      if (snake[i].y == head.y) {
+        snake[i].x -= speed;
       } else {
-        snake[i].y += speed;
+        snake[i].y -= speed;
       }
       drawPlayer();
     }
-  } else {
+  } else if (auto == 4) {
     for (let i = 0; i < snake.length; i++) {
-      if (snake[i].y == head.y) { // czemu coordianate nie dziala a head dziala ??
+      if (snake[i].y == head.y) {
         snake[i].x += speed;
       } else {
         snake[i].y -= speed;
@@ -179,39 +172,26 @@ function autoMoveX() {
 
 document.addEventListener("keyup", move);
 
-let autoY = 0;
-let autoX = 0;
+let inter = 0;
 
 function move() {
   if (auto == 1) {
-    myStopFunctionY();
-    myStopFunctionX();
-    speed = 30;
-    autoY = setInterval(autoMoveY, speedTime);
+    stopFunction()
+    inter = setInterval(autoMove, speedTime);
   } else if (auto == 2) {
-    myStopFunctionY();
-    myStopFunctionX();
-    speed = -30;
-    autoY = setInterval(autoMoveY, speedTime);
+    stopFunction()
+    inter = setInterval(autoMove, speedTime);
   } else if (auto == 3) {
-    myStopFunctionY();
-    myStopFunctionX();
-    speed = -30;
-    autoX = setInterval(autoMoveX, speedTime);
+    stopFunction()
+    inter = setInterval(autoMove, speedTime);
   } else if (auto == 4) {
-    myStopFunctionY();
-    myStopFunctionX();
-    speed = 30;
-    autoX = setInterval(autoMoveX, speedTime);
+    stopFunction()
+    inter = setInterval(autoMove, speedTime);
   }
 }
 
-function myStopFunctionY() {
-  clearInterval(autoY);
-}
-
-function myStopFunctionX() {
-  clearInterval(autoX);
+function stopFunction() {
+  clearInterval(inter);
 }
 
 //points
