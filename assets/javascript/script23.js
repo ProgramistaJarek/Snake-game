@@ -1,0 +1,254 @@
+//canvas
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 600;
+canvas.height = 600;
+
+//variables
+let score = 0;
+let award;
+let collision;
+let speed = 30;
+let speedTime = 100;
+let coordinates = { x: 0, y: 0 };
+
+//player
+let position = { x: 300, y: 300 };
+let box = 30;
+let snake = [
+  { x: 300, y: 300 },
+  { x: 300, y: 330 },
+  { x: 300, y: 360 },
+  { x: 300, y: 390 },
+  { x: 300, y: 420 },
+  { x: 300, y: 450 },
+  { x: 300, y: 480 },
+];
+let auto;
+let head;
+
+//points
+let randomX = (canvas.width - 30) / 30;
+let randomY = (canvas.height - 30) / 30;
+let pointPositionX = Math.floor(Math.random() * randomX);
+let pointPositionY = Math.floor(Math.random() * randomY);
+let pointsBox = 30;
+pointPositionX = pointPositionX * 30;
+pointPositionY = pointPositionY * 30;
+
+//game
+function init() {
+  buildBoard();
+  headSnake();
+  drawPlayer();
+  points(pointPositionX, pointPositionY);
+  requestAnimationFrame(init);
+}
+
+init();
+
+//board
+function buildBoard() {
+  ctx.fillStyle = "green";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "darkgreen";
+  for (let i = 0; i < canvas.width; i += 60) {
+    for (let j = 0; j < canvas.height; j += 60) {
+      ctx.fillRect(i, j, 30, 30);
+    }
+  }
+  for (let i = 30; i < canvas.width; i += 60) {
+    for (let j = 30; j < canvas.height; j += 60) {
+      ctx.fillRect(i, j, 30, 30);
+    }
+  }
+  ctx.closePath();
+}
+
+//player
+function draw(snakePart) {
+  if (snakePart.x == head.x && snakePart.y == head.y) ctx.fillStyle = "white";
+  else ctx.fillStyle = "yellow";
+  ctx.beginPath();
+  ctx.fillRect(snakePart.x, snakePart.y, box, box);
+  ctx.strokeRect(snakePart.x, snakePart.y, box, box);
+}
+
+function drawPlayer() {
+  snake.forEach(draw);
+}
+
+function headSnake() {
+  head = { x: snake[0].x, y: snake[0].y };
+}
+
+//arrows
+window.addEventListener("keydown", arrows, true);
+
+let DOWN = false;
+let UP = false;
+let LEFT = false;
+let RIGHT = false;
+
+function arrows(event) {
+  if (event.defaultPrevented) return;
+
+  switch (event.key) {
+    case "Down":
+    case "ArrowDown":
+      if (auto == 2) auto = 2;
+      else auto = 1;
+      DOWN = true;
+      UP = false;
+      break;
+    case "Up":
+    case "ArrowUp":
+      if (auto == 1) auto = 1;
+      else auto = 2;
+      UP = true;
+      DOWN = false;
+      break;
+    case "Left":
+    case "ArrowLeft":
+      if (auto == 4) auto = 4;
+      else auto = 3;
+      LEFT = true;
+      RIGHT = false;
+      break;
+    case "Right":
+    case "ArrowRight":
+      if (auto == 3) auto = 3;
+      else auto = 4;
+      RIGHT = true;
+      LEFT = false;
+      break;
+    case "Enter":
+      // Do something for "enter" or "return" key press.
+      break;
+    case "Escape":
+      // Do something for "esc" key press.
+      break;
+    default:
+      return;
+  }
+  console.log(event.key);
+  event.preventDefault();
+}
+
+//auto move
+function autoMove() {
+  if (auto == 1) {
+    //down
+    for (let i = 0; i < snake.length; i++) {
+      if (LEFT) {
+        if (snake[i].x == head.x) {
+          snake[i].y += speed;
+        } else {
+          snake[i].x -= speed;
+        }
+      } else {
+        if (snake[i].x == head.x) {
+          snake[i].y += speed;
+        } else {
+          snake[i].x += speed;
+        }
+      }
+      drawPlayer();
+    }
+  } else if (auto == 2) {
+    //up
+    for (let i = 0; i < snake.length; i++) {
+      if (LEFT) {
+        if (snake[i].x == head.x) {
+          snake[i].y -= speed;
+        } else {
+          snake[i].x -= speed;
+        }
+      } else {
+        if (snake[i].x == head.x) {
+          snake[i].y -= speed;
+        } else {
+          snake[i].x += speed;
+        }
+      }
+      drawPlayer();
+    }
+  } else if (auto == 3) {
+    //left
+    for (let i = 0; i < snake.length; i++) {
+      if (DOWN) {
+        if (snake[i].y == head.y) {
+          snake[i].x -= speed;
+        } else {
+          snake[i].y += speed;
+        }
+      } else {
+        if (snake[i].y == head.y) {
+          snake[i].x -= speed;
+        } else {
+          snake[i].y -= speed;
+        }
+      }
+      drawPlayer();
+    }
+  } else if (auto == 4) {
+    //right
+    for (let i = 0; i < snake.length; i++) {
+      if (DOWN) {
+        if (snake[i].y == head.y) {
+          snake[i].x += speed;
+        } else {
+          snake[i].y += speed;
+        }
+      } else {
+        if (snake[i].y == head.y) {
+          snake[i].x += speed;
+        } else {
+          snake[i].y -= speed;
+        }
+      }
+      //drawPlayer();
+    }
+  }
+  /*ctx.clearRect(0, 0, canvas.height, canvas.width);
+  buildBoard();
+  points(pointPositionX, pointPositionY);*/
+}
+
+document.addEventListener("keyup", move, true);
+
+let inter = 0;
+
+function move() {
+  if (auto == 1) {
+    stopFunction();
+    inter = setInterval(autoMove, speedTime);
+  } else if (auto == 2) {
+    stopFunction();
+    inter = setInterval(autoMove, speedTime);
+  } else if (auto == 3) {
+    stopFunction();
+    inter = setInterval(autoMove, speedTime);
+  } else if (auto == 4) {
+    stopFunction();
+    inter = setInterval(autoMove, speedTime);
+  }
+}
+
+function stopFunction() {
+  clearInterval(inter);
+}
+
+//points
+function drawPoints(x, y) {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.fillRect(x, y, pointsBox, pointsBox);
+  ctx.closePath();
+}
+
+function points(pointPositionX, pointPositionY) {
+  x = pointPositionX;
+  y = pointPositionY;
+  drawPoints(x, y);
+}

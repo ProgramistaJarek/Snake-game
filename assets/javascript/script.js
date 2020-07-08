@@ -20,32 +20,58 @@ let snake = [
   { x: 300, y: 330 },
   { x: 300, y: 360 },
   { x: 300, y: 390 },
-  { x: 300, y: 420 },
-  { x: 300, y: 450 },
-  { x: 300, y: 480 },
 ];
 let auto;
 let head;
+let d;
+let GAME;
 
 //points
 let randomX = (canvas.width - 30) / 30;
 let randomY = (canvas.height - 30) / 30;
+let pointsBox = 30;
 let pointPositionX = Math.floor(Math.random() * randomX);
 let pointPositionY = Math.floor(Math.random() * randomY);
-let pointsBox = 30;
 pointPositionX = pointPositionX * 30;
 pointPositionY = pointPositionY * 30;
 
-//game
-function init() {
-  buildBoard();
-  headSnake();
-  drawPlayer();
-  points(pointPositionX, pointPositionY);
-  requestAnimationFrame(init);
+// code for change frames in requestAnimationFrame
+var stop = false;
+var frameCount = 0;
+var fps, fpsInterval, startTime, now, then, elapsed;
+
+// initialize the timer variables and start the animation
+startAnimating(10);
+function startAnimating(fps) {
+  fpsInterval = 1000 / fps;
+  then = Date.now();
+  startTime = then;
+  animate();
+}
+// the animation loop calculates time elapsed since the last loop
+// and only draws if your specified fps interval is achieved
+
+function animate() {
+  // request another frame
+  requestAnimationFrame(animate);
+
+  // calc elapsed time since last loop
+  now = Date.now();
+  elapsed = now - then;
+
+  // if enough time has elapsed, draw the next frame
+  if (elapsed > fpsInterval) {
+    then = now - (elapsed % fpsInterval);
+
+    // Put your drawing code here
+    buildBoard();
+    headSnake();
+    drawPlayer();
+    drawPoints();
+  }
 }
 
-init();
+animate();
 
 //board
 function buildBoard() {
@@ -65,26 +91,6 @@ function buildBoard() {
   ctx.closePath();
 }
 
-//player
-function draw(snakePart) {
-  if (snakePart.x == head.x && snakePart.y == head.y)
-    ctx.fillStyle = "white";
-  else
-    ctx.fillStyle = "yellow";
-  ctx.beginPath();
-  ctx.fillRect(snakePart.x, snakePart.y, box, box);
-  ctx.strokeRect(snakePart.x, snakePart.y, box, box);
-}
-
-function drawPlayer() {
-  snake.forEach(draw);
-}
-
-//this code it isn't my (:
-function headSnake() {
-  head = { x: snake[0].x, y: snake[0].y };
-}
-
 //arrows
 window.addEventListener("keydown", arrows);
 
@@ -94,23 +100,22 @@ function arrows(event) {
   switch (event.key) {
     case "Down":
     case "ArrowDown":
-      if (auto == 2) auto = 2;
-      else auto = 1;
+      if (d != "UP") d = "DOWN";
       break;
     case "Up":
     case "ArrowUp":
-      if (auto == 1) auto = 1;
-      else auto = 2;
+      if (d != "DOWN") d = "UP";
+      GAME = true;
       break;
     case "Left":
     case "ArrowLeft":
-      if (auto == 4) auto = 4;
-      else auto = 3;
+      if (d != "RIGHT") d = "LEFT";
+      GAME = true;
       break;
     case "Right":
     case "ArrowRight":
-      if (auto == 3) auto = 3;
-      else auto = 4;
+      if (d != "LEFT") d = "RIGHT";
+      GAME = true;
       break;
     case "Enter":
       // Do something for "enter" or "return" key press.
@@ -121,90 +126,53 @@ function arrows(event) {
     default:
       return;
   }
-  console.log(event.key);
   event.preventDefault();
 }
 
-//auto move
-function autoMove() {
-  if (auto == 1) {
-    for (let i = 0; i < snake.length; i++) {
-      if (snake[i].x == head.x) {
-        snake[i].y += speed;
-      } else {
-          snake[i].x -= speed;
-      }
-      drawPlayer();
-    }
-  } else if (auto == 2) {
-    for (let i = 0; i < snake.length; i++) {
-      if (snake[i].x == head.x) {
-        snake[i].y -= speed;
-      } else {
-        snake[i].x += speed;
-      }
-      drawPlayer();
-    }
-  }
-  else if (auto == 3) {
-    for (let i = 0; i < snake.length; i++) {
-      if (snake[i].y == head.y) {
-        snake[i].x -= speed;
-      } else {
-        snake[i].y -= speed;
-      }
-      drawPlayer();
-    }
-  } else if (auto == 4) {
-    for (let i = 0; i < snake.length; i++) {
-      if (snake[i].y == head.y) {
-        snake[i].x += speed;
-      } else {
-        snake[i].y -= speed;
-      }
-      drawPlayer();
-    }
-  }
-  ctx.clearRect(0, 0, canvas.height, canvas.width);
-  buildBoard();
-  points(pointPositionX, pointPositionY);
+//player
+function draw(snakePart) {
+  ctx.fillStyle =
+    snakePart.x == head.x && snakePart.y == head.y ? "white" : "yellow";
+  ctx.beginPath();
+  ctx.fillRect(snakePart.x, snakePart.y, box, box);
+  ctx.strokeRect(snakePart.x, snakePart.y, box, box);
 }
 
-document.addEventListener("keyup", move);
+function drawPlayer() {
+  snake.forEach(draw);
+  if (GAME) {
+    let snakeX = head.x;
+    let snakeY = head.y;
 
-let inter = 0;
+    if (d == "LEFT") snakeX -= box;
+    if (d == "RIGHT") snakeX += box;
+    if (d == "UP") snakeY -= box;
+    if (d == "DOWN") snakeY += box;
 
-function move() {
-  if (auto == 1) {
-    stopFunction()
-    inter = setInterval(autoMove, speedTime);
-  } else if (auto == 2) {
-    stopFunction()
-    inter = setInterval(autoMove, speedTime);
-  } else if (auto == 3) {
-    stopFunction()
-    inter = setInterval(autoMove, speedTime);
-  } else if (auto == 4) {
-    stopFunction()
-    inter = setInterval(autoMove, speedTime);
+    if (snake[0].x == pointPositionX && snake[0].y == pointPositionY) {
+      score++;
+      pointPositionX = Math.floor(Math.random() * randomX);
+      pointPositionY = Math.floor(Math.random() * randomY);
+      pointPositionX = pointPositionX * 30;
+      pointPositionY = pointPositionY * 30;
+    } else snake.pop();
+    let newHead = {
+      x: snakeX,
+      y: snakeY,
+    };
+
+    snake.unshift(newHead);
   }
 }
 
-function stopFunction() {
-  clearInterval(inter);
+function headSnake() {
+  head = { x: snake[0].x, y: snake[0].y };
 }
 
 //points
-function drawPoints(x, y) {
+function drawPoints() {
   ctx.fillStyle = "red";
   ctx.beginPath();
-  ctx.fillRect(x, y, pointsBox, pointsBox);
+  ctx.fillRect(pointPositionX, pointPositionY, pointsBox, pointsBox);
   ctx.closePath();
-}
-
-function points(pointPositionX, pointPositionY) {
-  x = pointPositionX;
-  y = pointPositionY;
-  drawPoints(x, y);
-  requestAnimationFrame(points);
 }
