@@ -159,10 +159,10 @@ function drawPlayer() {
     };
 
     if (
-      snakeX == canvas.width + box ||
-      snakeY == canvas.height + box ||
-      snakeX == -2 * box ||
-      snakeY == -2 * box ||
+      snakeX > canvas.width + box ||
+      snakeY > canvas.height + box ||
+      snakeX < -2 * box ||
+      snakeY < -2 * box ||
       collision(newHead)
     )
       alert("Game over");
